@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <!-- <link rel='stylesheet' href='/stylesheets/style.css' /> -->
+  </head>
+  <body>
+    <div class="p-2">
+      모두텍 다자간 실시간 채팅
+    </div>
+    <div id="app" class="">
+      <div class="border p-2 space-y-1">
+        <div class="space-x-1">
+          <input v-model="userId" class="border p-1"/>
+          <button @click="login" class="bg-indigo-100 p-1">로그인</button>
+          <button @click="logout" class="bg-indigo-100 p-1">로그아웃</button>
+        </div>
+        <!-- <div class="space-x-1">
+          <input v-model="roomId" class="border p-1"/>
+          <button @click="join" class="bg-indigo-100 p-1">Join</button>
+          <button @click="leave" class="bg-indigo-100 p-1">Leave</button>
+        </div> -->
+      </div>
+
+      <div class="flex space-x-1 p-1">
+        <div v-for="room in rooms" :key="room.roomId" class="w-80">
+          <div>
+            <div class="flex space-x-1 items-center">
+              <div class="font-bold bg-indigo-100 text-black p-1 rounded-t-lg">{{ room.roomId }}</div>
+              <button v-if="!room.isJoined" @click="join(room.roomId)" class="bg-indigo-100 p-1">Join</button>
+              <button v-else @click="leave(room.roomId)" class="bg-indigo-100 p-1">X</button>
+            </div>
+            <div v-if="room.isJoined">
+              <div class="overflow-auto h-40 p-2 space-y-1 bg-indigo-100 " :ref="'msg_box_'+room.roomId" >
+                <div v-for="message in room.messages" :key="message" class="w-40">
+                  <div v-if="message.cmd">
+                    # {{ message.cmd }} {{ message.success }}
+                  </div>
+                  <div v-else>
+                    <div v-if="message.from === userId" class="text-right">
+                      <span class="bg-indigo-100 rounded px-2"> {{ message.message }}</span>
+                    </div>
+                    <div v-else>
+                      <span class="bg-blue-200 text-sm px-1 rounded-lg">{{ message.from }}</span>
+                        {{ message.message }}
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  &nbsp;
+                </div>
+              </div>
+              <div class="w-full flex">
+                <input v-model="room.text" class="border p-1 w-full" @keyup.enter="send(room.roomId, room.text); room.text=''" ref="inputText"/>
+                <button @click="send(room.roomId, room.text); room.text=''" class="bg-indigo-100 p-1">Send</button>
+                <button @click=" send(room.roomId, '😍'); room.text=''" class="p-1">😍</button>
+                <button @click=" send(room.roomId, '🥶'); room.text=''" class="p-1">🥶</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fixed bottom-0 text-sm w-full ">
+        <div v-if="socketConnected" class="px-2 bg-slate-700 text-white w-full">
+          ws: connected
+        </div>
+        <div v-else class="px-2 bg-red-500 text-white w-full">
+          ws: disconnected
+        </div>
+      </div>
+
+    </div>
+  </body>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+    }
+  }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module" src="/javascripts/app.js"></script>
+</html>
